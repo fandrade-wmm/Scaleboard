@@ -30,6 +30,7 @@
       "brief": "Brief",
       "strategy": "Estrategia",
       "creative-requests": "Creative Requests",
+      "financials": "Financials",
       "email-flows": "Email Flows",
       "attraction-matrix": "Attraction Matrix",
       "test-lab": "Test Lab",
@@ -46,10 +47,11 @@
       "create": "Crear cliente"
     },
     "paste": {
-      "title": "Pega el brief del cliente",
+      "title": "Pega o sube el brief del cliente",
       "placeholder": "Pega aquí el brief completo: oferta, ICP, USP, competidores, KPI, presupuesto…",
       "submit": "Estructurar con IA",
-      "optional": "Opcional — completar después en Configuración"
+      "optional": "Opcional — completar después en Configuración",
+      "uploadDoc": "Subir documento (PDF o Word)"
     },
     "review": {
       "title": "Revisa los campos extraídos",

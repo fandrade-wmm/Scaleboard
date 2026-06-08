@@ -22,6 +22,32 @@ export function OnboardingFlow({
   const [extracted, setExtracted] = useState<Partial<BriefFrontmatter> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [committing, setCommitting] = useState(false);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+  const [uploadedFilename, setUploadedFilename] = useState<string | null>(null);
+
+  async function handleFile(file: File) {
+    setError(null);
+    setUploadingDoc(true);
+    setUploadedFilename(file.name);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/extract", { method: "POST", body: form });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+        setError(body.error ?? `HTTP ${res.status}`);
+        setUploadedFilename(null);
+        return;
+      }
+      const { text } = (await res.json()) as { text: string };
+      setRawPaste((prev) => (prev.trim() ? `${prev}\n\n${text}` : text));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setUploadedFilename(null);
+    } finally {
+      setUploadingDoc(false);
+    }
+  }
 
   async function runStructurer() {
     setError(null);
@@ -35,7 +61,8 @@ export function OnboardingFlow({
         body: JSON.stringify({ rawPaste }),
       });
       if (!res.ok || !res.body) {
-        setError(`HTTP ${res.status}`);
+        const body = await res.json().catch(() => null);
+        setError(body?.error ?? `HTTP ${res.status}`);
         setPhase("paste");
         return;
       }
@@ -118,6 +145,35 @@ export function OnboardingFlow({
       <section className="glass-card-elevated p-6 flex flex-col gap-4">
         <h1 className="text-2xl font-bold">{client.name}</h1>
         <p className="label-caps text-secondary">{t("onboarding.paste.title")}</p>
+
+        <div className="flex items-center gap-3 flex-wrap">
+          <label
+            className={`glass-card px-3 py-2 text-sm cursor-pointer hover:bg-glass-elevated inline-flex items-center gap-2 ${
+              uploadingDoc ? "opacity-60 pointer-events-none" : ""
+            }`}
+          >
+            <span>📎</span>
+            <span>{t("onboarding.paste.uploadDoc")}</span>
+            <input
+              type="file"
+              accept=".pdf,.docx,.txt,.md,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleFile(f);
+                e.target.value = "";
+              }}
+            />
+          </label>
+          {uploadingDoc && (
+            <span className="text-xs text-secondary">{t("common.loading")}</span>
+          )}
+          {!uploadingDoc && uploadedFilename && (
+            <span className="text-xs text-success font-mono">✓ {uploadedFilename}</span>
+          )}
+          <span className="text-xs text-secondary ml-auto">PDF · DOCX · TXT · MD</span>
+        </div>
+
         <textarea
           value={rawPaste}
           onChange={(e) => setRawPaste(e.target.value)}
@@ -128,7 +184,7 @@ export function OnboardingFlow({
         {error && <p className="text-sm text-danger">{error}</p>}
         <button
           onClick={runStructurer}
-          disabled={!rawPaste.trim()}
+          disabled={!rawPaste.trim() || uploadingDoc}
           className="bg-primary text-white font-medium rounded-md-token py-2 disabled:opacity-50"
         >
           {t("onboarding.paste.submit")}

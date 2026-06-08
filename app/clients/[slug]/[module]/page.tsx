@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
+// Modules with real pages have their own folder — only list remaining placeholders here
 const PLACEHOLDER_MODULES = new Set([
-  "strategy",
-  "creative-requests",
   "email-flows",
   "attraction-matrix",
   "test-lab",

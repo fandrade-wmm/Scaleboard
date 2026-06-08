@@ -30,6 +30,7 @@
       "brief": "Brief",
       "strategy": "Strategy",
       "creative-requests": "Creative Requests",
+      "financials": "Financials",
       "email-flows": "Email Flows",
       "attraction-matrix": "Attraction Matrix",
       "test-lab": "Test Lab",
@@ -46,10 +47,11 @@
       "create": "Create client"
     },
     "paste": {
-      "title": "Paste the client brief",
+      "title": "Paste or upload the client brief",
       "placeholder": "Paste the full brief here: offer, ICP, USP, competitors, KPI, budget…",
       "submit": "Structure with AI",
-      "optional": "Optional — fill in later from Settings"
+      "optional": "Optional — fill in later from Settings",
+      "uploadDoc": "Upload document (PDF or Word)"
     },
     "review": {
       "title": "Review the extracted fields",

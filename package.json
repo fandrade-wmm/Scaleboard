@@ -18,9 +18,12 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",
+    "@types/pdf-parse": "^1.1.5",
     "gray-matter": "^4.0.3",
+    "mammoth": "^1.12.0",
     "next": "^15.0.0",
     "next-intl": "^3.20.0",
+    "pdf-parse": "^2.4.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "slugify": "^1.6.6",

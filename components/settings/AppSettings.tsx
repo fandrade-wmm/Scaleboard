@@ -74,10 +74,13 @@ export function AppSettings({
             className="bg-glass-surface border border-glass-border rounded-md-token px-3 py-2 w-fit"
           >
             <option value="anthropic">Anthropic (direct)</option>
-            <option value="openrouter" disabled>
-              OpenRouter (future)
-            </option>
+            <option value="openrouter">OpenRouter (unified gateway)</option>
           </select>
+          <p className="text-xs text-secondary">
+            Provider is selected at runtime via the <code className="font-mono">AI_PROVIDER</code>{" "}
+            env var. This setting is informational for v1 — restart the dev server after
+            changing <code className="font-mono">.env.local</code>.
+          </p>
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="label-caps text-secondary">{t("settings.app.defaultModel")}</span>

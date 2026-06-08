@@ -8,6 +8,7 @@ const MODULES = [
   "brief",
   "strategy",
   "creative-requests",
+  "financials",
   "email-flows",
   "attraction-matrix",
   "test-lab",
