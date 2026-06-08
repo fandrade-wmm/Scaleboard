@@ -9,6 +9,22 @@ import type { ClientSummary, ClientStatus } from "@/lib/schemas";
 
 const GROUP_ORDER: ClientStatus[] = ["active", "onboarding", "paused", "archived"];
 
+const STATUS_DOTS: Record<ClientStatus, string> = {
+  active:     "bg-success",
+  onboarding: "bg-warning",
+  paused:     "bg-secondary/60",
+  archived:   "bg-white/20",
+};
+
+function ClientInitials({ name }: { name: string }) {
+  return name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0] ?? "")
+    .join("")
+    .toUpperCase() || "??";
+}
+
 export function Sidebar({ initialClients }: { initialClients: ClientSummary[] }) {
   const t = useTranslations("sidebar");
   const { collapsed, toggleCollapsed, expandedGroups, toggleGroup } = useSidebar();
@@ -16,11 +32,12 @@ export function Sidebar({ initialClients }: { initialClients: ClientSummary[] })
   const [search, setSearch] = useState("");
   const pathname = usePathname();
 
+  // `[` shortcut
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "[" && !e.metaKey && !e.ctrlKey && !e.altKey) {
-        const target = e.target as HTMLElement | null;
-        if (target?.tagName === "INPUT" || target?.tagName === "TEXTAREA") return;
+        const t = e.target as HTMLElement | null;
+        if (t?.tagName === "INPUT" || t?.tagName === "TEXTAREA") return;
         toggleCollapsed();
       }
     };
@@ -28,121 +45,173 @@ export function Sidebar({ initialClients }: { initialClients: ClientSummary[] })
     return () => window.removeEventListener("keydown", handler);
   }, [toggleCollapsed]);
 
+  // Refresh client list on navigation
   useEffect(() => {
     let cancelled = false;
     fetch("/api/clients")
       .then((r) => (r.ok ? r.json() : []))
-      .then((list: ClientSummary[]) => {
-        if (!cancelled) setClients(list);
-      })
+      .then((list: ClientSummary[]) => { if (!cancelled) setClients(list); })
       .catch(() => undefined);
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [pathname]);
 
   const grouped = useMemo(() => {
     const filter = search.trim().toLowerCase();
     const matched = filter
-      ? clients.filter(
-          (c) =>
-            c.name.toLowerCase().includes(filter) ||
-            c.vertical.toLowerCase().includes(filter),
+      ? clients.filter((c) =>
+          c.name.toLowerCase().includes(filter) ||
+          c.vertical.toLowerCase().includes(filter)
         )
       : clients;
-    const map: Record<ClientStatus, ClientSummary[]> = {
-      active: [],
-      onboarding: [],
-      paused: [],
-      archived: [],
-    };
+    const map: Record<ClientStatus, ClientSummary[]> = { active: [], onboarding: [], paused: [], archived: [] };
     for (const c of matched) map[c.status].push(c);
     return map;
   }, [clients, search]);
 
   return (
     <aside
-      className={`${collapsed ? "w-14" : "w-[280px]"} h-screen sticky top-0 transition-all glass-card-elevated m-2 flex flex-col`}
+      className={`sidebar ${
+        collapsed ? "w-[60px]" : "w-[268px]"
+      } h-screen sticky top-0 flex-shrink-0 flex flex-col transition-all duration-300 overflow-hidden z-20`}
     >
-      <div className="p-3 border-b border-glass-border flex items-center gap-2">
+      {/* Logo area */}
+      <div className={`flex items-center gap-3 px-3 py-4 border-b border-white/5 ${collapsed ? "justify-center" : ""}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/scaleboard-mark.svg" alt="Scaleboard" width={28} height={28} className="shrink-0" />
         {!collapsed && (
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t("search")}
-            className="flex-1 bg-transparent text-sm focus:outline-none placeholder:text-secondary/60"
-          />
+          <div>
+            <div className="text-sm font-bold text-white leading-none">Scaleboard</div>
+            <div className="text-[10px] text-secondary/60 font-mono tracking-wide mt-0.5">by Web My Money</div>
+          </div>
         )}
       </div>
 
-      <nav className="flex-1 overflow-y-auto p-2 space-y-3">
+      {/* Search */}
+      {!collapsed && (
+        <div className="px-3 pt-3 pb-2">
+          <div className="relative">
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-secondary/40 text-xs">⌕</span>
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t("search")}
+              className="w-full pl-7 pr-3 py-1.5 text-xs rounded-lg transition-all"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.09)",
+                color: "var(--color-text)",
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Client list */}
+      <nav className="flex-1 overflow-y-auto px-2 py-1">
         {collapsed ? (
-          <div className="flex flex-col items-center gap-2 py-2">
-            {clients.slice(0, 12).map((c) => (
-              <Link
-                key={c.id}
-                href={`/clients/${c.slug}/brief`}
-                title={c.name}
-                className={`w-9 h-9 rounded-md-token grid place-items-center text-xs font-semibold ${
-                  pathname?.includes(`/clients/${c.slug}`)
-                    ? "bg-primary text-white"
-                    : "bg-glass-surface text-secondary hover:bg-glass-elevated"
-                }`}
-              >
-                {c.name.slice(0, 2).toUpperCase()}
-              </Link>
-            ))}
+          /* Collapsed: initials only */
+          <div className="flex flex-col items-center gap-1.5 py-2">
+            {clients.slice(0, 12).map((c) => {
+              const active = pathname?.includes(`/clients/${c.slug}`);
+              return (
+                <Link
+                  key={c.id}
+                  href={`/clients/${c.slug}/brief`}
+                  title={`${c.name}\n${c.vertical}`}
+                  className={`w-10 h-10 rounded-xl grid place-items-center text-[11px] font-bold transition-all duration-200 ${
+                    active
+                      ? "bg-primary text-white shadow-glow-sm"
+                      : "text-secondary hover:text-text"
+                  }`}
+                  style={active ? {} : { background: "rgba(255,255,255,0.07)" }}
+                >
+                  <ClientInitials name={c.name} />
+                </Link>
+              );
+            })}
           </div>
         ) : (
-          GROUP_ORDER.map((group) => {
-            const items = grouped[group];
-            if (items.length === 0) return null;
-            const expanded = expandedGroups[group] ?? false;
-            return (
-              <div key={group}>
-                <button
-                  onClick={() => toggleGroup(group)}
-                  className="w-full label-caps text-secondary px-2 py-1 flex items-center justify-between hover:text-text"
-                >
-                  <span>{t(`groups.${group}`)}</span>
-                  <span className="text-[0.6rem]">{expanded ? "▾" : "▸"}</span>
-                </button>
-                {expanded && (
-                  <ul className="space-y-1 mt-1">
-                    {items.map((c) => {
-                      const active = pathname?.includes(`/clients/${c.slug}`);
-                      return (
-                        <li key={c.id}>
-                          <Link
-                            href={`/clients/${c.slug}/brief`}
-                            className={`block px-3 py-2 rounded-md-token text-sm transition ${
-                              active
-                                ? "glass-card border-primary/40 shadow-glass text-text"
-                                : "hover:bg-glass-surface text-secondary"
-                            }`}
-                          >
-                            <div className="font-medium text-text truncate">{c.name}</div>
-                            <div className="text-xs text-secondary truncate">{c.vertical}</div>
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </div>
-            );
-          })
-        )}
-        {clients.length === 0 && !collapsed && (
-          <p className="text-sm text-secondary px-2 mt-2">{t("empty")}</p>
+          /* Expanded: grouped list */
+          <div className="space-y-3 py-1">
+            {GROUP_ORDER.map((group) => {
+              const items = grouped[group];
+              if (items.length === 0) return null;
+              const expanded = expandedGroups[group] ?? true;
+              return (
+                <div key={group}>
+                  <button
+                    onClick={() => toggleGroup(group)}
+                    className="w-full px-2 py-1 flex items-center justify-between text-[10px] font-mono font-semibold tracking-widest uppercase transition-colors"
+                    style={{ color: "rgba(136,146,176,0.5)" }}
+                  >
+                    <span>{t(`groups.${group}` as never)}</span>
+                    <span className="text-[8px]" style={{ color: "rgba(136,146,176,0.3)" }}>
+                      {expanded ? "▾" : "▸"}
+                    </span>
+                  </button>
+
+                  {expanded && (
+                    <ul className="space-y-0.5 mt-0.5">
+                      {items.map((c) => {
+                        const active = pathname?.includes(`/clients/${c.slug}`);
+                        return (
+                          <li key={c.id}>
+                            <Link
+                              href={`/clients/${c.slug}/brief`}
+                              className={`flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-sm transition-all duration-200 ${
+                                active ? "sidebar-item-active" : "border border-transparent hover:bg-white/5"
+                              }`}
+                            >
+                              {/* Initials badge */}
+                              <div
+                                className={`w-7 h-7 rounded-lg grid place-items-center text-[10px] font-bold shrink-0 ${
+                                  active ? "bg-primary/30 text-primary" : "text-secondary"
+                                }`}
+                                style={active ? {} : { background: "rgba(255,255,255,0.08)" }}
+                              >
+                                <ClientInitials name={c.name} />
+                              </div>
+
+                              <div className="flex-1 min-w-0">
+                                <div
+                                  className="text-xs font-semibold truncate leading-tight"
+                                  style={{ color: active ? "var(--color-text)" : "rgba(228,232,255,0.75)" }}
+                                >
+                                  {c.name}
+                                </div>
+                                <div className="text-[10px] truncate" style={{ color: "rgba(136,146,176,0.6)" }}>
+                                  {c.vertical}
+                                </div>
+                              </div>
+
+                              {/* Status dot */}
+                              <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${STATUS_DOTS[c.status]}`} />
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </div>
+              );
+            })}
+
+            {clients.length === 0 && (
+              <p className="text-xs px-2 py-3 text-center" style={{ color: "var(--color-secondary)" }}>
+                {t("empty")}
+              </p>
+            )}
+          </div>
         )}
       </nav>
 
-      <div className="p-3 border-t border-glass-border flex items-center gap-2">
+      {/* Bottom: new client + collapse */}
+      <div className="p-2 border-t border-white/5 flex items-center gap-2">
         {!collapsed && (
           <Link
             href="/onboarding"
-            className="flex-1 bg-primary text-white text-sm font-medium px-3 py-2 rounded-md-token hover:opacity-90"
+            className="flex-1 bg-primary text-white text-xs font-semibold px-3 py-2 rounded-xl text-center hover:opacity-90 transition-opacity"
+            style={{ boxShadow: "var(--shadow-glow-sm)" }}
           >
             {t("newClient")}
           </Link>
@@ -151,7 +220,8 @@ export function Sidebar({ initialClients }: { initialClients: ClientSummary[] })
           onClick={toggleCollapsed}
           title={collapsed ? t("expand") : t("collapse")}
           aria-label={collapsed ? t("expand") : t("collapse")}
-          className="w-9 h-9 rounded-md-token glass-card grid place-items-center text-sm font-mono"
+          className="w-8 h-8 rounded-xl grid place-items-center text-xs transition-all hover:bg-white/8 shrink-0"
+          style={{ color: "rgba(136,146,176,0.5)", background: "rgba(255,255,255,0.04)" }}
         >
           {collapsed ? "›" : "‹"}
         </button>

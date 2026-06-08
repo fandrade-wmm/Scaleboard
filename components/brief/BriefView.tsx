@@ -1,61 +1,66 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslations } from "next-intl";
 import type { Brief, Client } from "@/lib/schemas";
 
 export function BriefView({ client, brief }: { client: Client; brief: Brief }) {
-  const t = useTranslations();
   const fm = brief.frontmatter;
+
   return (
-    <div className="flex flex-col gap-4">
-      <header className="flex items-center justify-between">
+    <div className="flex flex-col gap-6">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <div className="label-caps text-secondary">{client.vertical}</div>
-          <h1 className="text-2xl font-bold">{client.name}</h1>
+          <p className="label-caps mb-2">{client.vertical}</p>
+          <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "var(--color-text)" }}>
+            {client.name}
+          </h1>
         </div>
-        <Link
-          href={`/onboarding/${client.slug}`}
-          className="glass-card px-3 py-2 text-sm hover:bg-glass-elevated"
-        >
-          {t("onboarding.review.rerun")}
+        <Link href={`/onboarding/${client.slug}`} className="btn-ghost text-sm">
+          Re-run AI →
         </Link>
-      </header>
+      </div>
 
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <Field label={t("brief.fields.offer")}>{fm.offer}</Field>
-        <Field label={t("brief.fields.icp")}>{fm.icp}</Field>
-        <Field label={t("brief.fields.usp")}>{fm.usp}</Field>
-        <Field label={t("brief.fields.kpi")}>{fm.kpi}</Field>
-        <Field label={t("brief.fields.budget")}>{fm.budget}</Field>
-        <Field label={t("brief.fields.competitors")}>
+      {/* Bento grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <BriefField label="Offer" value={fm.offer} accent="primary" />
+        <BriefField label="ICP" value={fm.icp} />
+        <BriefField label="USP" value={fm.usp} />
+        <BriefField label="KPI" value={fm.kpi} accent="success" />
+        <BriefField label="Budget" value={fm.budget} accent="warning" />
+        <div className="glass-card p-4">
+          <p className="label-caps mb-2">Competitors</p>
           {fm.competitors.length ? (
-            <ul className="list-disc list-inside">
+            <div className="flex flex-wrap gap-1.5">
               {fm.competitors.map((c) => (
-                <li key={c.slug}>{c.name}</li>
+                <span key={c.slug} className="badge badge-muted">{c.name}</span>
               ))}
-            </ul>
+            </div>
           ) : (
-            "—"
+            <span className="text-sm" style={{ color: "var(--color-secondary)" }}>—</span>
           )}
-        </Field>
-      </section>
+        </div>
+      </div>
 
+      {/* Raw brief body */}
       {brief.body && (
-        <section className="glass-card p-4">
-          <div className="label-caps text-secondary mb-2">Notes</div>
-          <pre className="whitespace-pre-wrap text-sm font-sans">{brief.body}</pre>
-        </section>
+        <div className="glass-card p-4">
+          <p className="label-caps mb-3">Full brief</p>
+          <pre className="text-xs whitespace-pre-wrap font-sans leading-relaxed" style={{ color: "var(--color-secondary)" }}>
+            {brief.body}
+          </pre>
+        </div>
       )}
     </div>
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function BriefField({ label, value, accent }: { label: string; value: string; accent?: "primary" | "success" | "warning" }) {
+  const accentClass = accent ? `accent-${accent}` : "";
   return (
-    <div className="glass-card p-3">
-      <div className="label-caps text-secondary mb-1">{label}</div>
-      <div className="text-sm text-text">{children}</div>
+    <div className={`glass-card p-4 ${accentClass}`}>
+      <p className="label-caps mb-2">{label}</p>
+      <p className="text-sm leading-relaxed" style={{ color: "var(--color-text)" }}>{value}</p>
     </div>
   );
 }

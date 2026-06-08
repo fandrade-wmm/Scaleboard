@@ -34,11 +34,11 @@ export default async function RootLayout({
           {needsBootstrap ? (
             <CreateAdmin />
           ) : (
-            <div className="flex min-h-screen">
+            <div className="flex h-screen overflow-hidden">
               <Sidebar initialClients={clients} />
-              <div className="flex-1 flex flex-col">
+              <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 <AppHeader currentUser={currentUser} />
-                <div className="flex-1 p-2">{children}</div>
+                <div className="flex-1 overflow-y-auto">{children}</div>
               </div>
             </div>
           )}

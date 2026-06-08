@@ -33,44 +33,31 @@ export function NewClientForm() {
   }
 
   return (
-    <form onSubmit={submit} className="glass-card-elevated p-6 flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">{t("onboarding.title")}</h1>
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="label-caps text-secondary">{t("onboarding.newClient.name")}</span>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          className="bg-glass-surface border border-glass-border rounded-md-token px-3 py-2"
-        />
+    <form onSubmit={submit} className="glass-card-elevated p-7 flex flex-col gap-4 max-w-lg mx-auto">
+      <div>
+        <p className="label-caps mb-2">New Client</p>
+        <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "var(--color-text)" }}>
+          {t("onboarding.title")}
+        </h1>
+      </div>
+      <label className="flex flex-col gap-1.5">
+        <span className="label-caps">{t("onboarding.newClient.name")}</span>
+        <input value={name} onChange={(e) => setName(e.target.value)} required className="glass-input" placeholder="Acme Corp" />
       </label>
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="label-caps text-secondary">{t("onboarding.newClient.vertical")}</span>
-        <input
-          value={vertical}
-          onChange={(e) => setVertical(e.target.value)}
-          required
-          className="bg-glass-surface border border-glass-border rounded-md-token px-3 py-2"
-        />
+      <label className="flex flex-col gap-1.5">
+        <span className="label-caps">{t("onboarding.newClient.vertical")}</span>
+        <input value={vertical} onChange={(e) => setVertical(e.target.value)} required className="glass-input" placeholder="SaaS / E-commerce / Services…" />
       </label>
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="label-caps text-secondary">{t("settings.app.language")}</span>
-        <select
-          value={language}
-          onChange={(e) => setLanguage(e.target.value as "es" | "en")}
-          className="bg-glass-surface border border-glass-border rounded-md-token px-3 py-2"
-        >
+      <label className="flex flex-col gap-1.5">
+        <span className="label-caps">{t("settings.app.language")}</span>
+        <select value={language} onChange={(e) => setLanguage(e.target.value as "es" | "en")} className="glass-input">
           <option value="es">Español</option>
           <option value="en">English</option>
         </select>
       </label>
-      {error && <p className="text-sm text-danger">{error}</p>}
-      <button
-        type="submit"
-        disabled={submitting}
-        className="bg-primary text-white font-medium rounded-md-token py-2 disabled:opacity-50"
-      >
-        {submitting ? "…" : t("onboarding.newClient.create")}
+      {error && <p className="text-sm" style={{ color: "#EA2143" }}>{error}</p>}
+      <button type="submit" disabled={submitting} className="btn-primary w-full mt-1">
+        {submitting ? <span className="spinner" /> : t("onboarding.newClient.create")}
       </button>
     </form>
   );

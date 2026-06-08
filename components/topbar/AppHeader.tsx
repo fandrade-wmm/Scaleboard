@@ -8,6 +8,10 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { ClientModuleTabs } from "./ClientModuleTabs";
 
+function ClientInitials({ name }: { name: string }) {
+  return name.split(/\s+/).slice(0, 2).map((w) => w[0] ?? "").join("").toUpperCase() || "?";
+}
+
 export function AppHeader({ currentUser }: { currentUser: Member | null }) {
   const t = useTranslations();
   const { client, setClient } = useActiveClient();
@@ -18,51 +22,78 @@ export function AppHeader({ currentUser }: { currentUser: Member | null }) {
   }, [pathname, client, setClient]);
 
   return (
-    <header className="glass-card-elevated mx-2 mt-2 px-4 py-2 flex items-center gap-4 min-h-[3rem]">
-      <nav className="flex items-center gap-2 text-sm">
-        <Link href="/" className="flex items-center gap-2 hover:opacity-80" aria-label={t("common.appName")}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/scaleboard-mark.svg" alt="" width={24} height={24} />
-          <span className="font-semibold text-text">{t("common.appName")}</span>
-        </Link>
-        {client && (
+    <header
+      className="mx-2 mt-2 flex items-center gap-3 px-4"
+      style={{
+        background: "rgba(255,255,255,0.07)",
+        backdropFilter: "blur(32px)",
+        WebkitBackdropFilter: "blur(32px)",
+        border: "1px solid rgba(255,255,255,0.10)",
+        borderRadius: "14px",
+        minHeight: "52px",
+        boxShadow: "0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.07)",
+      }}
+    >
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-1.5 text-sm shrink-0">
+        {client ? (
           <>
-            <span className="text-secondary/60">›</span>
+            <Link href="/" className="text-secondary/60 hover:text-secondary transition-colors text-xs font-medium">
+              {t("common.appName")}
+            </Link>
+            <span className="text-white/15 text-xs">›</span>
             <Link
               href={`/clients/${client.slug}/brief`}
-              className="text-text font-medium hover:text-primary"
+              className="font-semibold text-sm hover:text-primary transition-colors"
+              style={{ color: "var(--color-text)" }}
             >
               {client.name}
             </Link>
           </>
+        ) : (
+          <Link href="/" className="font-semibold text-sm" style={{ color: "var(--color-text)" }}>
+            {t("common.appName")}
+          </Link>
         )}
       </nav>
 
-      <div className="flex-1" />
+      {/* Separator */}
+      {client && <div className="w-px h-4 bg-white/10 shrink-0" />}
 
-      {client && <ClientModuleTabs slug={client.slug} clientStatus={client.status} />}
+      {/* Module tabs — scrollable, masked edges */}
+      {client && (
+        <div className="flex-1 min-w-0">
+          <ClientModuleTabs slug={client.slug} clientStatus={client.status} />
+        </div>
+      )}
 
+      {/* Spacer when no client */}
+      {!client && <div className="flex-1" />}
+
+      {/* Settings */}
       <Link
         href="/settings"
-        className="w-9 h-9 grid place-items-center rounded-md-token glass-card text-sm hover:bg-glass-elevated"
         title={t("topbar.settings")}
         aria-label={t("topbar.settings")}
+        className="w-8 h-8 grid place-items-center rounded-xl transition-all text-secondary hover:text-text shrink-0"
+        style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
       >
-        ⚙
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+          <path d="M7.5 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" fill="currentColor"/>
+          <path fillRule="evenodd" clipRule="evenodd" d="M6.073 1.5a1.5 1.5 0 00-1.478 1.255L4.44 3.57a5.5 5.5 0 00-.87.505l-.772-.264a1.5 1.5 0 00-1.826.75l-.5 1a1.5 1.5 0 00.426 1.903l.666.499a5.52 5.52 0 000 1.074l-.666.5a1.5 1.5 0 00-.427 1.902l.5 1a1.5 1.5 0 001.827.75l.771-.264c.272.188.563.357.87.505l.155.815A1.5 1.5 0 006.073 13.5h2.854a1.5 1.5 0 001.478-1.255l.155-.815c.307-.148.598-.317.87-.505l.771.264a1.5 1.5 0 001.827-.75l.5-1a1.5 1.5 0 00-.427-1.903l-.666-.499a5.52 5.52 0 000-1.074l.666-.5a1.5 1.5 0 00.427-1.902l-.5-1a1.5 1.5 0 00-1.827-.75l-.771.264a5.5 5.5 0 00-.87-.505l-.155-.815A1.5 1.5 0 008.927 1.5H6.073zm-.565 2.118A4 4 0 017.5 3a4 4 0 011.992.618l.214.135.937-.32a.5.5 0 01.608.25l.5 1a.5.5 0 01-.142.634l-.81.607a4.02 4.02 0 010 1.552l.81.607a.5.5 0 01.142.634l-.5 1a.5.5 0 01-.608.25l-.937-.32-.214.135A4 4 0 017.5 10a4 4 0 01-1.992-.618l-.214-.135-.937.32a.5.5 0 01-.608-.25l-.5-1a.5.5 0 01.142-.634l.81-.607a4.019 4.019 0 010-1.552l-.81-.607a.5.5 0 01-.142-.634l.5-1a.5.5 0 01.608-.25l.937.32.214-.135z" fill="currentColor"/>
+        </svg>
       </Link>
 
+      {/* User avatar */}
       {currentUser && (
-        <div
-          className="w-9 h-9 grid place-items-center rounded-full bg-primary text-white text-xs font-semibold"
-          title={`${currentUser.name} (${currentUser.role})`}
+        <Link
+          href="/settings"
+          title={`${currentUser.name} — ${currentUser.role}`}
+          className="w-8 h-8 rounded-xl grid place-items-center text-[11px] font-bold text-white shrink-0 transition-opacity hover:opacity-80"
+          style={{ background: "linear-gradient(135deg, #1856FF, #3A344E)", boxShadow: "var(--shadow-glow-sm)" }}
         >
-          {currentUser.name
-            .split(" ")
-            .map((p) => p[0])
-            .join("")
-            .slice(0, 2)
-            .toUpperCase()}
-        </div>
+          <ClientInitials name={currentUser.name} />
+        </Link>
       )}
     </header>
   );

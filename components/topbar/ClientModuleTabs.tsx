@@ -5,47 +5,37 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 const MODULES = [
-  "brief",
-  "strategy",
-  "creative-requests",
-  "financials",
-  "email-flows",
-  "attraction-matrix",
-  "test-lab",
-  "settings",
+  { key: "brief",            label: "Brief" },
+  { key: "strategy",         label: "Strategy" },
+  { key: "creative-requests",label: "Creative" },
+  { key: "financials",       label: "Financials" },
+  { key: "email-flows",      label: "Emails" },
+  { key: "attraction-matrix",label: "Attraction" },
+  { key: "test-lab",         label: "Test Lab" },
+  { key: "settings",         label: "⚙" },
 ] as const;
 
-export function ClientModuleTabs({
-  slug,
-  clientStatus,
-}: {
-  slug: string;
-  clientStatus: string;
-}) {
+type ModuleKey = (typeof MODULES)[number]["key"];
+
+export function ClientModuleTabs({ slug, clientStatus }: { slug: string; clientStatus: string }) {
   const t = useTranslations();
   const pathname = usePathname() ?? "";
-  const currentModule = pathname.split("/")[3] ?? "brief";
+  const currentModule = (pathname.split("/")[3] ?? "brief") as ModuleKey;
 
   return (
-    <div className="flex items-center gap-1 text-xs">
-      {MODULES.map((m) => {
-        const isActive = currentModule === m;
-        const gated = m !== "brief" && m !== "settings" && clientStatus === "onboarding";
+    <div className="module-tabs-scroll px-1">
+      {MODULES.map(({ key, label }) => {
+        const isActive = currentModule === key;
+        const gated = key !== "brief" && key !== "settings" && clientStatus === "onboarding";
         return (
           <Link
-            key={m}
-            href={gated ? `/clients/${slug}/brief` : `/clients/${slug}/${m}`}
+            key={key}
+            href={gated ? `/clients/${slug}/brief` : `/clients/${slug}/${key}`}
             aria-disabled={gated}
             title={gated ? t("onboarding.gated") : undefined}
-            className={`px-2 py-1 rounded-sm-token transition ${
-              isActive
-                ? "bg-primary text-white"
-                : gated
-                  ? "text-secondary/40 cursor-not-allowed"
-                  : "text-secondary hover:text-text"
-            }`}
+            className={`module-tab ${isActive ? "module-tab-active" : ""} ${gated ? "opacity-30 cursor-not-allowed pointer-events-none" : ""}`}
           >
-            {t(`topbar.modules.${m}` as never)}
+            {label}
           </Link>
         );
       })}

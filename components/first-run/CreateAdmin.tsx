@@ -31,46 +31,51 @@ export function CreateAdmin() {
 
   return (
     <main className="min-h-screen grid place-items-center p-8">
-      <form
-        onSubmit={submit}
-        className="glass-card-elevated p-8 w-full max-w-md flex flex-col gap-4"
-      >
-        <div className="flex flex-col items-center gap-3 mb-2">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="flex flex-col items-center mb-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/scaleboard-wordmark.svg" alt="Scaleboard by Web My Money" height={48} />
+          <img src="/scaleboard-mark.svg" alt="Scaleboard" width={48} height={48} className="mb-3" />
+          <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "var(--color-text)" }}>Scaleboard</h1>
+          <p className="text-sm mt-1" style={{ color: "var(--color-secondary)" }}>by Web My Money</p>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold mb-1">{t("title")}</h1>
-          <p className="text-sm text-secondary">{t("subtitle")}</p>
-        </div>
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="label-caps text-secondary">{t("name")}</span>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            className="bg-glass-surface border border-glass-border rounded-md-token px-3 py-2"
-          />
-        </label>
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="label-caps text-secondary">{t("email")}</span>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="bg-glass-surface border border-glass-border rounded-md-token px-3 py-2"
-          />
-        </label>
-        {error && <p className="text-sm text-danger">{error}</p>}
-        <button
-          type="submit"
-          disabled={submitting}
-          className="bg-primary text-white font-medium rounded-md-token py-2 disabled:opacity-50"
-        >
-          {submitting ? "…" : t("submit")}
-        </button>
-      </form>
+
+        <form onSubmit={submit} className="glass-card-elevated p-7 flex flex-col gap-4">
+          <div>
+            <h2 className="text-lg font-bold mb-1" style={{ color: "var(--color-text)" }}>{t("title")}</h2>
+            <p className="text-sm" style={{ color: "var(--color-secondary)" }}>{t("subtitle")}</p>
+          </div>
+
+          <label className="flex flex-col gap-1.5">
+            <span className="label-caps">{t("name")}</span>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="glass-input"
+            />
+          </label>
+
+          <label className="flex flex-col gap-1.5">
+            <span className="label-caps">{t("email")}</span>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="glass-input"
+            />
+          </label>
+
+          {error && (
+            <p className="text-sm" style={{ color: "#EA2143" }}>{error}</p>
+          )}
+
+          <button type="submit" disabled={submitting} className="btn-primary w-full mt-1">
+            {submitting ? <span className="spinner" /> : t("submit")}
+          </button>
+        </form>
+      </div>
     </main>
   );
 }
