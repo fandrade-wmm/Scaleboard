@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 import { designTokens } from "./lib/design-tokens/tokens";
 
-const { colors, spacing, radii, typography } = designTokens;
+const { radii, spacing } = designTokens;
 
 const config: Config = {
   content: [
@@ -12,28 +12,26 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Brand palette — unchanged
-        primary:  colors.primary,   // #1856FF
-        success:  colors.success,   // #07CA6B
-        warning:  colors.warning,   // #E89558
-        danger:   colors.danger,    // #EA2143
+        // WMM Brand palette
+        primary:  "#8fccb6",   // Pearl Aqua
+        "primary-dark": "#5aaa94",
+        navy:     "#1f2d56",   // Space Cadet
+        success:  "#8fccb6",
+        warning:  "#E89558",
+        danger:   "#e05c6a",
 
-        // Semantic tokens — driven by CSS vars (adapt to dark theme)
+        // Semantic tokens — CSS vars for dark mode
         secondary: "var(--color-secondary)",
         surface:   "var(--color-surface)",
         text:      "var(--color-text)",
-        neutral:   "var(--color-neutral)",
+        neutral:   "var(--color-bg)",
         muted:     "var(--color-muted)",
       },
       fontFamily: {
-        sans:    ["var(--font-plus-jakarta-sans)", "system-ui", "sans-serif"],
-        display: ["var(--font-plus-jakarta-sans)", "system-ui", "sans-serif"],
-        mono:    ["var(--font-jetbrains-mono)", "ui-monospace", "monospace"],
-      },
-      fontSize: {
-        h1:            typography.h1.fontSize,
-        body:          typography.bodyMd.fontSize,
-        "label-caps":  typography.labelCaps.fontSize,
+        sans:    ["var(--font-inter)", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["Satoshi", "var(--font-inter)", "ui-sans-serif", "sans-serif"],
+        label:   ["var(--font-space-grotesk)", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono:    ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       spacing: {
         "sm-token": spacing.sm,
@@ -44,8 +42,8 @@ const config: Config = {
         "md-token": radii.md,
       },
       backdropBlur: {
-        glass:    "20px",
-        "glass-lg": "32px",
+        glass:     "20px",
+        "glass-lg":"32px",
       },
       backgroundColor: {
         "glass-surface":  "var(--glass-bg)",
@@ -54,23 +52,19 @@ const config: Config = {
         "glass-active":   "var(--glass-bg-active)",
       },
       borderColor: {
-        "glass-border":        "var(--glass-border)",
-        "glass-border-strong": "var(--glass-border-strong)",
+        "glass-border":       "var(--glass-border)",
+        "glass-border-strong":"var(--glass-border-strong)",
+        "glass-border-teal":  "var(--glass-border-teal)",
       },
       boxShadow: {
         glass:      "var(--shadow-glass)",
         "glass-lg": "var(--shadow-glass-lg)",
         glow:       "var(--shadow-glow)",
         "glow-sm":  "var(--shadow-glow-sm)",
-      },
-      animation: {
-        spin: "spin 0.6s linear infinite",
-        "fade-in": "fadeIn 0.2s ease-out",
-        "slide-up": "slideUp 0.2s ease-out",
-      },
-      keyframes: {
-        fadeIn:  { "0%": { opacity: "0" }, "100%": { opacity: "1" } },
-        slideUp: { "0%": { opacity: "0", transform: "translateY(4px)" }, "100%": { opacity: "1", transform: "translateY(0)" } },
+        1:          "var(--shadow-1)",
+        2:          "var(--shadow-2)",
+        3:          "var(--shadow-3)",
+        4:          "var(--shadow-4)",
       },
     },
   },

@@ -119,11 +119,13 @@ export function Sidebar({ initialClients }: { initialClients: ClientSummary[] })
                   href={`/clients/${c.slug}/brief`}
                   title={`${c.name}\n${c.vertical}`}
                   className={`w-10 h-10 rounded-xl grid place-items-center text-[11px] font-bold transition-all duration-200 ${
-                    active
-                      ? "bg-primary text-white shadow-glow-sm"
-                      : "text-secondary hover:text-text"
+                    active ? "shadow-glow-sm" : "hover:border-glass-border-teal"
                   }`}
-                  style={active ? {} : { background: "rgba(255,255,255,0.07)" }}
+                  style={
+                    active
+                      ? { background: "var(--pearl-aqua)", color: "#040404" }
+                      : { background: "rgba(255,255,255,0.07)", color: "var(--color-secondary)" }
+                  }
                 >
                   <ClientInitials name={c.name} />
                 </Link>
@@ -165,9 +167,13 @@ export function Sidebar({ initialClients }: { initialClients: ClientSummary[] })
                               {/* Initials badge */}
                               <div
                                 className={`w-7 h-7 rounded-lg grid place-items-center text-[10px] font-bold shrink-0 ${
-                                  active ? "bg-primary/30 text-primary" : "text-secondary"
+                                  active ? "text-[#040404]" : "text-secondary"
                                 }`}
-                                style={active ? {} : { background: "rgba(255,255,255,0.08)" }}
+                                style={
+                                  active
+                                    ? { background: "var(--pearl-aqua)" }
+                                    : { background: "rgba(255,255,255,0.08)" }
+                                }
                               >
                                 <ClientInitials name={c.name} />
                               </div>
@@ -210,8 +216,10 @@ export function Sidebar({ initialClients }: { initialClients: ClientSummary[] })
         {!collapsed && (
           <Link
             href="/onboarding"
-            className="flex-1 bg-primary text-white text-xs font-semibold px-3 py-2 rounded-xl text-center hover:opacity-90 transition-opacity"
-            style={{ boxShadow: "var(--shadow-glow-sm)" }}
+            className="flex-1 text-xs font-semibold px-3 py-2 rounded-xl text-center transition-all"
+            style={{ background: "var(--pearl-aqua)", color: "#040404", boxShadow: "var(--shadow-glow-sm)" }}
+            onMouseEnter={(e) => { (e.target as HTMLElement).style.background = "var(--pearl-aqua-dark)"; }}
+            onMouseLeave={(e) => { (e.target as HTMLElement).style.background = "var(--pearl-aqua)"; }}
           >
             {t("newClient")}
           </Link>

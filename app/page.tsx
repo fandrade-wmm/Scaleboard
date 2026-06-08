@@ -38,7 +38,7 @@ export default async function HomePage() {
             <div className="stat-label">Active</div>
           </div>
           <div className="stat-card">
-            <div className="stat-value" style={{ color: "#E89558" }}>{boarding.length}</div>
+            <div className="stat-value" style={{ color: "var(--pearl-aqua)" }}>{boarding.length}</div>
             <div className="stat-label">Onboarding</div>
           </div>
           <div className="stat-card">
@@ -78,8 +78,8 @@ export default async function HomePage() {
                 <div className="flex items-start gap-3">
                   {/* Avatar */}
                   <div
-                    className="w-10 h-10 rounded-xl grid place-items-center text-sm font-bold text-white shrink-0"
-                    style={{ background: "linear-gradient(135deg, rgba(24,86,255,0.5), rgba(58,52,78,0.5))" }}
+                    className="w-10 h-10 rounded-xl grid place-items-center text-sm font-bold shrink-0"
+                    style={{ background: "linear-gradient(135deg, #1f2d56 0%, #8fccb6 100%)", color: "#040404" }}
                   >
                     {initials}
                   </div>

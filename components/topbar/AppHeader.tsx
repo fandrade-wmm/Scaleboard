@@ -90,7 +90,7 @@ export function AppHeader({ currentUser }: { currentUser: Member | null }) {
           href="/settings"
           title={`${currentUser.name} — ${currentUser.role}`}
           className="w-8 h-8 rounded-xl grid place-items-center text-[11px] font-bold text-white shrink-0 transition-opacity hover:opacity-80"
-          style={{ background: "linear-gradient(135deg, #1856FF, #3A344E)", boxShadow: "var(--shadow-glow-sm)" }}
+          style={{ background: "linear-gradient(135deg, #1f2d56 0%, #8fccb6 100%)", boxShadow: "var(--shadow-glow-sm)" }}
         >
           <ClientInitials name={currentUser.name} />
         </Link>

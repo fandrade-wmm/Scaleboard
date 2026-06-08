@@ -2,7 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
-import { plusJakartaSans, jetBrainsMono } from "./fonts";
+import { inter, spaceGrotesk } from "./fonts";
 import { getTeamRepo, getSessionProvider } from "@/lib/team";
 import { getClientRepo } from "@/lib/repo";
 import { Sidebar } from "@/components/sidebar/Sidebar";
@@ -28,7 +28,7 @@ export default async function RootLayout({
   const clients = needsBootstrap ? [] : await getClientRepo().listClients().catch(() => []);
 
   return (
-    <html lang={locale} className={`${plusJakartaSans.variable} ${jetBrainsMono.variable}`}>
+    <html lang={locale} className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
           {needsBootstrap ? (

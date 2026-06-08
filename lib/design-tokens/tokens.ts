@@ -2,26 +2,26 @@
 // Do not edit by hand; edit DESIGN.md and run `npm run build:tokens`.
 
 export const designTokens = {
-  name: "Glassmorphism",
+  name: "WMM Dark",
   colors: {
-    primary: "#1856FF",
-    secondary: "#3A344E",
-    success: "#07CA6B",
-    warning: "#E89558",
-    danger: "#EA2143",
-    surface: "#FFFFFF",
-    text: "#141414",
-    neutral: "#FFFFFF",
+    primary:   "#8fccb6",
+    secondary: "#1f2d56",
+    success:   "#8fccb6",
+    warning:   "#E89558",
+    danger:    "#e05c6a",
+    surface:   "#0f1624",
+    text:      "#fbfbfb",
+    neutral:   "#080c14",
   },
   typography: {
-    h1: {"fontFamily":"Plus Jakarta Sans","fontSize":"3rem"},
-    bodyMd: {"fontFamily":"Plus Jakarta Sans","fontSize":"1rem"},
-    labelCaps: {"fontFamily":"JetBrains Mono","fontSize":"0.75rem"},
-    weights: "100, 200, 300, 400, 500, 600, 700, 800, 900",
+    h1:        { fontFamily: "Satoshi",      fontSize: "3.5rem" },
+    bodyMd:    { fontFamily: "Inter",         fontSize: "1rem" },
+    labelCaps: { fontFamily: "Space Grotesk", fontSize: "0.6875rem" },
+    weights:   "100, 200, 300, 400, 500, 600, 700, 800, 900",
   },
   radii: {
-    sm: "4px",
-    md: "8px",
+    sm: "8px",
+    md: "12px",
   },
   spacing: {
     sm: "8px",
