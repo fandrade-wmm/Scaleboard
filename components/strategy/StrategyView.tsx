@@ -44,6 +44,7 @@ export function StrategyView({ client, brief, initialAngles, initialHooks, initi
     setError(null);
     setAngles([]); setHooks([]); setChannels(null); setLp(null); setJourney(null);
 
+    let gotData = false;
     try {
       const res = await fetch(`/api/clients/${client.id}/strategy`, {
         method: "POST",
@@ -73,22 +74,29 @@ export function StrategyView({ client, brief, initialAngles, initialHooks, initi
             const evt = JSON.parse(line.slice(6)) as AnyObj;
             if (evt.type === "phase") setStatus(String(evt.label ?? ""));
             if (evt.type === "block" && evt.block === "core") {
-              setAngles(Array.isArray(evt.data?.angles) ? evt.data.angles : []);
+              const a = Array.isArray(evt.data?.angles) ? evt.data.angles : [];
+              setAngles(a);
+              if (a.length > 0) gotData = true;
             }
             if (evt.type === "block" && evt.block === "tactics") {
               setHooks(Array.isArray(evt.data?.hooks) ? evt.data.hooks : []);
               setChannels(evt.data?.channels ?? null);
               setLp(evt.data?.lp ?? null);
+              // ✅ Show results immediately when tactics arrive — don't wait for journey
+              gotData = true;
+              setPhase("done");
             }
             if (evt.type === "block" && evt.block === "journey") setJourney(evt.data);
             if (evt.type === "done") setPhase("done");
             if (evt.type === "error") { setError(String(evt.error)); setPhase("error"); }
-          } catch { /* skip */ }
+          } catch { /* skip malformed chunk */ }
         }
       }
+      // ✅ Fallback: stream closed without explicit done — show whatever arrived
+      if (gotData) setPhase("done");
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-      setPhase("error");
+      if (gotData) setPhase("done"); // keep showing results even if stream broke
+      else { setError(err instanceof Error ? err.message : String(err)); setPhase("error"); }
     }
   }, [client.id]);
 

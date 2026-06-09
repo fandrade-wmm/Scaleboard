@@ -63,8 +63,8 @@ export async function POST(
   const gate = await requireApiPermission("ai.invoke");
   if ("error" in gate) return gate.error;
 
-  const body = await req.json().catch(() => ({}));
-  RequestSchema.parse(body);
+  const rawBody = await req.json().catch(() => ({}));
+  const body = RequestSchema.parse(rawBody);
 
   const client = await getClientRepo().getClient(id);
   const brief = await getClientRepo().getBrief(id);
@@ -104,15 +104,15 @@ export async function POST(
         const [coreResult, tacticsResult] = await Promise.allSettled([
           ai.generate({
             clientId: id, module: "strategy",
-            prompt: `GENERATE BLOCK 1 ONLY (core strategy + angles).\n\n${briefText}`,
+            prompt: `GENERATE BLOCK 1 ONLY (core strategy + angles). Be concise — max 8 angles.\n\n${briefText}`,
             guidelinesContext: guidelinesContext || undefined,
-            maxTokens: 6000, temperature: 0.6,
+            maxTokens: 3500, temperature: 0.6,
           }),
           ai.generate({
             clientId: id, module: "strategy",
-            prompt: `GENERATE BLOCK 2 ONLY (hooks, channels, LP, ads).\n\n${briefText}`,
+            prompt: `GENERATE BLOCK 2 ONLY (hooks, channels, LP). 3-4 hooks per angle max.\n\n${briefText}`,
             guidelinesContext: guidelinesContext || undefined,
-            maxTokens: 6000, temperature: 0.6,
+            maxTokens: 3500, temperature: 0.6,
           }),
         ]);
 
@@ -149,18 +149,24 @@ export async function POST(
           }
         }
 
-        // ── BLOCK 3 — Journey ─────────────────────────────────────────
-        send({ type: "phase", phase: "journey", label: "Mapping user journey…" });
-        const journeyResult = await ai.generate({
-          clientId: id, module: "strategy",
-          prompt: `GENERATE BLOCK 3 ONLY (user journey map). ${angles.length} angles generated.\n\n${briefText}`,
-          guidelinesContext: guidelinesContext || undefined,
-          maxTokens: 3000, temperature: 0.5,
-        });
-        const journeyParsed = safeJSON(journeyResult.text) as Record<string, unknown> | null;
-        if (journeyParsed) {
-          send({ type: "block", block: "journey", data: journeyParsed });
-          await getClientRepo().writeArtifact(id, ["densification-pack", "user-journey.json"], journeyParsed, z.any()).catch(() => null);
+        // ── BLOCK 3 — Journey (only when explicitly requested) ────────
+        if (body.includeJourney === true && angles.length > 0) {
+          send({ type: "phase", phase: "journey", label: "Mapping user journey…" });
+          try {
+            const journeyResult = await ai.generate({
+              clientId: id, module: "strategy",
+              prompt: `GENERATE BLOCK 3 ONLY (user journey map). Keep it to 5-6 stages max.\n\n${briefText}`,
+              guidelinesContext: guidelinesContext || undefined,
+              maxTokens: 2000, temperature: 0.5,
+            });
+            const journeyParsed = safeJSON(journeyResult.text) as Record<string, unknown> | null;
+            if (journeyParsed) {
+              send({ type: "block", block: "journey", data: journeyParsed });
+              await getClientRepo().writeArtifact(id, ["densification-pack", "user-journey.json"], journeyParsed, z.any()).catch(() => null);
+            }
+          } catch {
+            // Journey failure is non-fatal — blocks 1+2 data is already saved
+          }
         }
 
         send({ type: "done" });
