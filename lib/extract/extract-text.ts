@@ -45,7 +45,10 @@ export async function extractFromBuffer(
 ): Promise<ExtractedDoc> {
   const kind = detectKind(filename, mime);
   if (kind === "pdf") {
-    const { default: pdfParse } = await import("pdf-parse");
+    // pdf-parse exports differently in CJS vs ESM — handle both
+    const pdfMod = await import("pdf-parse");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pdfParse: (buf: Buffer) => Promise<{ text: string }> = (pdfMod as any).default ?? pdfMod;
     const result = await pdfParse(buffer);
     return { kind, filename, text: normalize(result.text) };
   }
